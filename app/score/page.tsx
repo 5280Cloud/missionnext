@@ -2,26 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { callAI, AIConfig } from "@/lib/ai-provider";
-
-const SCORING_PROMPT = `You are a career advisor helping veterans transition to civilian careers. 
-Evaluate the following job description and return a JSON object with this exact structure:
-{
-  "grade": "A",
-  "score": 92,
-  "summary": "Brief one sentence summary of the role",
-  "dimensions": [
-    { "name": "Mission Alignment", "score": 90, "feedback": "..." },
-    { "name": "Skill Match", "score": 85, "feedback": "..." },
-    { "name": "Growth Potential", "score": 95, "feedback": "..." },
-    { "name": "Compensation", "score": 88, "feedback": "..." },
-    { "name": "Culture Fit", "score": 90, "feedback": "..." }
-  ],
-  "pros": ["pro 1", "pro 2", "pro 3"],
-  "cons": ["con 1", "con 2"],
-  "recommendation": "A paragraph with your overall recommendation for a veteran applicant."
-}
-Return only valid JSON, no markdown, no explanation.`;
 
 const gradeColor: Record<string, string> = {
   A: "text-green-400",
@@ -44,7 +24,7 @@ export default function ScorePage() {
       return;
     }
 
-    const config: AIConfig = JSON.parse(stored);
+    const config = JSON.parse(stored);
     if (!config.apiKey) {
       setError("Please add your API key in Settings first.");
       return;
@@ -55,9 +35,19 @@ export default function ScorePage() {
     setResult(null);
 
     try {
-      const response = await callAI(config, SCORING_PROMPT, jobDescription);
-      const parsed = JSON.parse(response);
-      setResult(parsed);
+      const response = await fetch("/api/score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          apiKey: config.apiKey,
+          model: config.model,
+          jobDescription,
+        }),
+      });
+
+      if (!response.ok) throw new Error("API error");
+      const data = await response.json();
+      setResult(data);
     } catch (err) {
       setError("Failed to score the job. Check your API key and try again.");
     } finally {
@@ -68,7 +58,6 @@ export default function ScorePage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white p-8">
       <div className="max-w-3xl mx-auto">
-        {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link href="/" className="text-gray-500 hover:text-white transition-colors">← Back</Link>
           <div>
@@ -77,7 +66,6 @@ export default function ScorePage() {
           </div>
         </div>
 
-        {/* Input */}
         <div className="mb-4">
           <textarea
             value={jobDescription}
@@ -98,10 +86,8 @@ export default function ScorePage() {
           {loading ? "Analyzing..." : "Score This Job"}
         </button>
 
-        {/* Results */}
         {result && (
           <div className="space-y-6">
-            {/* Grade Card */}
             <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 flex items-center gap-6">
               <div className={`text-8xl font-bold ${gradeColor[result.grade] || "text-white"}`}>
                 {result.grade}
@@ -112,7 +98,6 @@ export default function ScorePage() {
               </div>
             </div>
 
-            {/* Dimensions */}
             <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
               <h2 className="text-lg font-semibold mb-4">Breakdown</h2>
               <div className="space-y-4">
@@ -134,7 +119,6 @@ export default function ScorePage() {
               </div>
             </div>
 
-            {/* Pros & Cons */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
                 <h2 className="text-lg font-semibold mb-3 text-green-400">Pros</h2>
@@ -158,7 +142,6 @@ export default function ScorePage() {
               </div>
             </div>
 
-            {/* Recommendation */}
             <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
               <h2 className="text-lg font-semibold mb-3">Recommendation</h2>
               <p className="text-gray-300 text-sm leading-relaxed">{result.recommendation}</p>
