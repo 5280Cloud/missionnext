@@ -41,12 +41,14 @@ export default function ScorePage() {
         body: JSON.stringify({
           apiKey: config.apiKey,
           model: config.model,
+          provider: config.provider,
           jobDescription,
         }),
       });
 
       if (!response.ok) throw new Error("API error");
       const data = await response.json();
+      if (data.error) throw new Error(data.error);
       setResult(data);
     } catch (err) {
       setError("Failed to score the job. Check your API key and try again.");
@@ -109,7 +111,7 @@ export default function ScorePage() {
                     </div>
                     <div className="w-full bg-gray-800 rounded-full h-2 mb-1">
                       <div
-                        className="bg-green-500 h-2 rounded-full transition-all"
+                        className="bg-green-500 h-2 rounded-full"
                         style={{ width: `${d.score}%` }}
                       />
                     </div>
