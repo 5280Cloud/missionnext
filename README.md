@@ -1,149 +1,115 @@
-# Gmail Unsubscribe Tool - Setup Instructions
+# MissionNext
 
-## What You Have
-1. `gmail_unsubscribe.py` - The main script
-2. `credentials.json` - Your OAuth credentials
+An open-source, AI-powered career transition platform built for veterans.
 
-## How to Run It
+Live: https://missionnext.vercel.app
 
-### Step 1: Install Python Libraries
-Open your terminal/command prompt and run:
-```bash
-pip install google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client
-```
+---
 
-### Step 2: Run the Script
-```bash
-python gmail_unsubscribe.py
-```
+## What's New — Interview Prep
 
-### Step 3: Authorize the App
-1. The script will display a URL
-2. Copy and paste it into your web browser
-3. Log in with your Gmail account
-4. Click "Allow" to give the app permission to read your emails
-5. Google will show you an authorization code
-6. Copy that code and paste it back into the terminal
-7. Press Enter
+MissionNext now includes a full Interview Prep feature, completing the end-to-end job flow:
 
-### Step 4: Results
-The script will:
-- Search through your recent emails for ones with "unsubscribe" links
-- Extract all the unsubscribe URLs
-- Create a file called `unsubscribe_report.txt` with all the results
-- Display the results in the terminal
+JD Ingestion > Resume Feedback > Application Tracking > Interview Prep
 
-## What the Script Does (Learning Notes)
+---
 
-### 1. Authentication (`authenticate_gmail()`)
-- Uses OAuth 2.0 to securely connect to Gmail
-- Saves a token so you don't have to log in every time
-- The token is saved in `token.pickle`
+## Features
 
-### 2. Searching Emails (`search_unsubscribe_emails()`)
-- Queries Gmail API with the search term "unsubscribe"
-- Returns up to 50 emails (you can change this number)
-- Uses Gmail's powerful search syntax
+### Job Scorer
+Paste a job description and get an A-F rating based on how well the role aligns with your background and transition goals.
 
-### 3. Getting Email Details (`get_email_details()`)
-- Fetches the full email including headers and body
-- Extracts sender and subject information
-- Handles Gmail's complex email structure
+### Resume Builder
+Upload your resume and a job description. The AI generates a tailored version optimized for that specific role.
 
-### 4. Extracting Links (`extract_unsubscribe_links()`)
-- Uses Regular Expressions (regex) to find URLs
-- Looks for common patterns like "unsubscribe", "opt-out", etc.
-- Removes duplicates
+### Application Tracker
+Track every job in one place. Log status, notes, dates, and next steps. Linked to the full job flow.
 
-## Customization Options
+### Job Scanner
+Scan job portals for roles that match your profile.
 
-### Change Number of Emails to Scan
-In the `main()` function, find this line:
-```python
-messages = search_unsubscribe_emails(service, max_results=50)
-```
-Change `50` to any number you want.
+### Interview Prep (New)
+Tied directly to a job application. Launch a mock interview powered by the JD you already ingested.
 
-### Make Search More Specific
-In the `search_unsubscribe_emails()` function, change the query:
-```python
-query = 'unsubscribe'
-```
+- Role-specific questions generated from the job description
+- Answer one question at a time via text or voice
+- Adaptive session length: after 5 strong answers you can wrap up or keep going (up to 15 questions)
+- End-of-session feedback: strength highlights, areas to improve, STAR method alignment, suggested better answers
+- Sessions saved to your account when logged in
+- Choose your AI provider per session: Claude, GPT-4o, or Gemini
 
-Examples:
-- `query = 'unsubscribe newer_than:30d'` - Only emails from last 30 days
-- `query = 'unsubscribe from:newsletter@example.com'` - From specific sender
-- `query = 'unsubscribe category:promotions'` - Only promotional emails
+---
 
-### Gmail Search Syntax
-You can combine multiple criteria:
-- `newer_than:7d` - Last 7 days
-- `older_than:1y` - Older than 1 year
-- `from:sender@domain.com` - From specific sender
-- `category:promotions` - Promotional tab
-- `is:unread` - Only unread emails
+## Getting Started
 
-## Next Steps (Phase 2)
+### Prerequisites
+- Node.js 18+
+- API key from Anthropic, OpenAI, or Google Gemini
+- Supabase project for auth and session persistence
 
-Want to automatically click unsubscribe links? We can add:
-1. Automated HTTP requests to unsubscribe URLs
-2. Ability to filter which senders to unsubscribe from
-3. A safer "preview mode" before taking action
-4. Statistics on how many subscriptions you have
+### Install and Run
 
-## Security Notes
+git clone https://github.com/5280Cloud/missionnext.git
+cd missionnext
+npm install
+npx next dev
 
-- Your `credentials.json` contains sensitive info - don't share it
-- The script only has READ-ONLY access to your Gmail
-- `token.pickle` stores your login - keep it safe
-- You can revoke access anytime at: https://myaccount.google.com/permissions
+Open http://localhost:3000 in your browser.
 
-## Troubleshooting
+### Environment Variables
 
-**"No module named 'google.auth'"**
-- Run: `pip install google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client`
+Create a .env.local file:
 
-**"Invalid credentials"**
-- Make sure `credentials.json` is in the same folder as the script
-- Check that your OAuth credentials are set up correctly in Google Cloud Console
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-**"Access blocked"**
-- In Google Cloud Console, make sure your OAuth consent screen is configured
-- Add your Gmail address to the test users list
+Never commit API keys to GitHub. AI provider keys are entered by the user in the UI.
 
-**No emails found**
-- Try a broader search query
-- Check if you actually have emails with unsubscribe links
-- Increase the `max_results` number
+---
 
-## Understanding the Code
+## Tech Stack
 
-### Key Concepts You're Learning:
-1. **API Authentication** - How to securely connect to external services
-2. **OAuth 2.0** - The standard way apps access user data with permission
-3. **JSON** - Data format for configuration and API responses
-4. **Regular Expressions** - Pattern matching for finding URLs
-5. **Base64 Decoding** - Gmail encodes email content
-6. **Recursion** - The `get_email_body()` function calls itself to handle nested email parts
-7. **Error Handling** - Try/except blocks to handle failures gracefully
+- Next.js 14 + TypeScript
+- Tailwind CSS
+- Supabase (auth + database)
+- Model-agnostic AI layer: Claude, GPT-4o, Gemini
+- Vercel (deployment)
 
-### Functions Explained:
-- `authenticate_gmail()` - Gets permission to access Gmail
-- `search_unsubscribe_emails()` - Finds relevant emails
-- `get_email_details()` - Gets full email information
-- `get_email_body()` - Extracts the actual email text (handles complex structure)
-- `extract_unsubscribe_links()` - Finds unsubscribe URLs using regex
-- `main()` - Orchestrates everything
+---
 
-## Want to Extend This?
+## Roadmap
 
-Ideas for enhancements:
-1. Add a GUI interface
-2. Automatically categorize senders by domain
-3. Create a whitelist of senders you want to keep
-4. Track which unsubscribes were successful
-5. Generate statistics (how many marketing emails per day, top senders, etc.)
-6. Export to CSV for analysis in Excel
-7. Add support for Outlook emails too
+- [x] Job Scorer
+- [x] Resume Builder
+- [x] Application Tracker
+- [x] Job Scanner
+- [x] Supabase auth
+- [x] Interview Prep
+- [ ] Veteran community sharing
+- [ ] Mobile-responsive polish
+- [ ] Exportable interview prep reports (PDF)
+- [ ] LinkedIn integration
 
-Let me know what you'd like to build next!
+---
+
+## Contributing
+
+Open source and built for the veteran community. Contributions welcome.
+
+1. Fork the repo
+2. Create a feature branch: git checkout -b feature/your-feature
+3. Commit: git commit -m "Add your feature"
+4. Push: git push origin feature/your-feature
+5. Open a Pull Request
+
+---
+
+## Acknowledgments
+
+Inspired by career-ops by Santiago (MIT License).
+
+---
+
+## License
+
+MIT
