@@ -219,9 +219,15 @@ export default function TrackerPage() {
                   <button onClick={() => handleEdit(app)} className="text-xs text-gray-400 hover:text-white transition-colors">
                     Edit
                   </button>
-                  <button onClick={() => handleDelete(app.id)} className="text-xs text-red-400 hover:text-red-300 transition-colors">
+                    <Link
+                    href={`/interview-prep/${app.id}`}
+                    className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                    >
+                    Interview Prep
+                    </Link>
+                    <button onClick={() => handleDelete(app.id)} className="text-xs text-red-400 hover:text-red-300 transition-colors">
                     Delete
-                  </button>
+                    </button>
                 </div>
               </div>
             ))}
